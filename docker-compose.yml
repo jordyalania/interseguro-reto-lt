@@ -1,0 +1,84 @@
+name: interseguro-reto-lt
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-endorsements}
+      POSTGRES_USER: ${POSTGRES_USER:-endorsements}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Ejecuta ./scripts/dev-setup.sh}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # Aplica migraciones y seeds, y termina. La API nunca migra al arrancar.
+  migrate:
+    build:
+      context: ./services/endorsement-api
+    command: ["node", "dist/database/migrate.js"]
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-endorsements}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-endorsements}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
+  endorsement-api:
+    build:
+      context: ./services/endorsement-api
+    environment:
+      NODE_ENV: production
+      PORT: "3001"
+      DATABASE_URL: postgres://${POSTGRES_USER:-endorsements}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-endorsements}
+      JWT_PRIVATE_KEY_B64: ${JWT_PRIVATE_KEY_B64:?Ejecuta ./scripts/dev-setup.sh}
+      JWT_PUBLIC_KEY_B64: ${JWT_PUBLIC_KEY_B64:?Ejecuta ./scripts/dev-setup.sh}
+      DEMO_USERNAME: ${DEMO_USERNAME:-demo}
+      DEMO_PASSWORD: ${DEMO_PASSWORD:?Ejecuta ./scripts/dev-setup.sh}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    ports:
+      - "127.0.0.1:3011:3001"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3001/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  routing-api:
+    build:
+      context: ./services/routing-api
+    environment:
+      PORT: "3002"
+      # Solo recibe la clave pública: puede verificar tokens, nunca emitirlos.
+      JWT_PUBLIC_KEY_B64: ${JWT_PUBLIC_KEY_B64:?Ejecuta ./scripts/dev-setup.sh}
+    ports:
+      - "127.0.0.1:3012:3002"
+    healthcheck:
+      test: ["CMD", "/app/api", "-healthcheck"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  web:
+    build:
+      context: ./apps/web
+    environment:
+      PORT: "8080"
+      ENDORSEMENT_API_URL: http://endorsement-api:3001
+      ROUTING_API_URL: http://routing-api:3002
+      NGINX_RESOLVER: 127.0.0.11
+    depends_on:
+      endorsement-api:
+        condition: service_healthy
+      routing-api:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8088:8080"
+
+volumes:
+  db-data:

@@ -1,0 +1,116 @@
+openapi: 3.0.3
+info:
+  title: API de rutas óptimas
+  version: 1.0.0
+  description: Calcula la ruta más corta entre la base de grúas más cercana y un siniestro.
+servers:
+  - url: http://127.0.0.1:3012
+security:
+  - bearerAuth: []
+paths:
+  /api/v1/routes/optimal:
+    post:
+      summary: Calcula la ruta óptima
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OptimalRouteRequest'
+      responses:
+        '200':
+          description: Ruta encontrada. Los empates entre bases se resuelven alfabéticamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptimalRoute'
+        '400':
+          description: Datos inválidos, por ejemplo una distancia negativa o una base inexistente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Token ausente o inválido.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '413':
+          description: El cuerpo supera 1 MiB.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Ninguna base puede llegar al siniestro.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /health:
+    get:
+      summary: Estado del servicio
+      security: []
+      responses:
+        '200':
+          description: El servicio está activo.
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    OptimalRouteRequest:
+      type: object
+      required: [accidentLocation, depots, graph]
+      additionalProperties: false
+      properties:
+        accidentLocation:
+          type: string
+          example: San Isidro
+        depots:
+          type: array
+          minItems: 1
+          items:
+            type: string
+          example: [Miraflores, Ate]
+        graph:
+          type: object
+          description: Grafo dirigido. Distrito, vecino y distancia.
+          additionalProperties:
+            type: object
+            additionalProperties:
+              type: number
+              minimum: 0
+          example:
+            Miraflores: { San Isidro: 7, Barranco: 3 }
+            San Isidro: { Miraflores: 7, Lince: 4 }
+    OptimalRoute:
+      type: object
+      required: [fromDepot, to, path, distance]
+      properties:
+        fromDepot:
+          type: string
+          example: Miraflores
+        to:
+          type: string
+          example: San Isidro
+        path:
+          type: array
+          items:
+            type: string
+          example: [Miraflores, San Isidro]
+        distance:
+          type: number
+          example: 7
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          example: LOCATION_UNREACHABLE
+        message:
+          type: string
