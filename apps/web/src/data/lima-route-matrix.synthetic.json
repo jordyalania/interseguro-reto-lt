@@ -1,0 +1,498 @@
+{
+  "synthetic": true,
+  "note": "Datos simulados con forma parecida a Google Routes. No son mediciones reales.",
+  "origins": [
+    {
+      "name": "Ate",
+      "latLng": {
+        "latitude": -12.0266,
+        "longitude": -76.9176
+      }
+    },
+    {
+      "name": "Barranco",
+      "latLng": {
+        "latitude": -12.1445,
+        "longitude": -77.0206
+      }
+    },
+    {
+      "name": "Callao",
+      "latLng": {
+        "latitude": -12.0566,
+        "longitude": -77.1181
+      }
+    },
+    {
+      "name": "Chorrillos",
+      "latLng": {
+        "latitude": -12.1758,
+        "longitude": -77.0156
+      }
+    },
+    {
+      "name": "Jesús María",
+      "latLng": {
+        "latitude": -12.0775,
+        "longitude": -77.0486
+      }
+    },
+    {
+      "name": "La Molina",
+      "latLng": {
+        "latitude": -12.0794,
+        "longitude": -76.94
+      }
+    },
+    {
+      "name": "La Victoria",
+      "latLng": {
+        "latitude": -12.0658,
+        "longitude": -77.0175
+      }
+    },
+    {
+      "name": "Lima Cercado",
+      "latLng": {
+        "latitude": -12.0464,
+        "longitude": -77.0428
+      }
+    },
+    {
+      "name": "Lince",
+      "latLng": {
+        "latitude": -12.0836,
+        "longitude": -77.0347
+      }
+    },
+    {
+      "name": "Los Olivos",
+      "latLng": {
+        "latitude": -11.9925,
+        "longitude": -77.07
+      }
+    },
+    {
+      "name": "Miraflores",
+      "latLng": {
+        "latitude": -12.1211,
+        "longitude": -77.0297
+      }
+    },
+    {
+      "name": "San Borja",
+      "latLng": {
+        "latitude": -12.1006,
+        "longitude": -77.0006
+      }
+    },
+    {
+      "name": "San Isidro",
+      "latLng": {
+        "latitude": -12.0976,
+        "longitude": -77.0365
+      }
+    },
+    {
+      "name": "San Miguel",
+      "latLng": {
+        "latitude": -12.0776,
+        "longitude": -77.0839
+      }
+    },
+    {
+      "name": "Surco",
+      "latLng": {
+        "latitude": -12.1459,
+        "longitude": -76.9911
+      }
+    },
+    {
+      "name": "Surquillo",
+      "latLng": {
+        "latitude": -12.1128,
+        "longitude": -77.0158
+      }
+    }
+  ],
+  "elements": [
+    {
+      "originIndex": 10,
+      "destinationIndex": 1,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 3619,
+      "duration": "814s"
+    },
+    {
+      "originIndex": 1,
+      "destinationIndex": 10,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 3619,
+      "duration": "814s"
+    },
+    {
+      "originIndex": 10,
+      "destinationIndex": 15,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 2302,
+      "duration": "319s"
+    },
+    {
+      "originIndex": 15,
+      "destinationIndex": 10,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 2302,
+      "duration": "319s"
+    },
+    {
+      "originIndex": 10,
+      "destinationIndex": 12,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 3530,
+      "duration": "489s"
+    },
+    {
+      "originIndex": 12,
+      "destinationIndex": 10,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 3530,
+      "duration": "489s"
+    },
+    {
+      "originIndex": 15,
+      "destinationIndex": 11,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 2779,
+      "duration": "385s"
+    },
+    {
+      "originIndex": 11,
+      "destinationIndex": 15,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 2779,
+      "duration": "385s"
+    },
+    {
+      "originIndex": 15,
+      "destinationIndex": 12,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 3659,
+      "duration": "263s"
+    },
+    {
+      "originIndex": 12,
+      "destinationIndex": 15,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 3659,
+      "duration": "263s"
+    },
+    {
+      "originIndex": 12,
+      "destinationIndex": 8,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 2040,
+      "duration": "282s"
+    },
+    {
+      "originIndex": 8,
+      "destinationIndex": 12,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 2040,
+      "duration": "282s"
+    },
+    {
+      "originIndex": 12,
+      "destinationIndex": 4,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 3372,
+      "duration": "759s"
+    },
+    {
+      "originIndex": 4,
+      "destinationIndex": 12,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 3372,
+      "duration": "759s"
+    },
+    {
+      "originIndex": 12,
+      "destinationIndex": 11,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 5093,
+      "duration": "367s"
+    },
+    {
+      "originIndex": 11,
+      "destinationIndex": 12,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 5093,
+      "duration": "367s"
+    },
+    {
+      "originIndex": 8,
+      "destinationIndex": 4,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 2154,
+      "duration": "485s"
+    },
+    {
+      "originIndex": 4,
+      "destinationIndex": 8,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 2154,
+      "duration": "485s"
+    },
+    {
+      "originIndex": 8,
+      "destinationIndex": 6,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 3540,
+      "duration": "1159s"
+    },
+    {
+      "originIndex": 6,
+      "destinationIndex": 8,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 3540,
+      "duration": "1159s"
+    },
+    {
+      "originIndex": 8,
+      "destinationIndex": 7,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 5498,
+      "duration": "396s"
+    },
+    {
+      "originIndex": 7,
+      "destinationIndex": 8,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 5498,
+      "duration": "396s"
+    },
+    {
+      "originIndex": 4,
+      "destinationIndex": 7,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 4570,
+      "duration": "633s"
+    },
+    {
+      "originIndex": 7,
+      "destinationIndex": 4,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 4570,
+      "duration": "633s"
+    },
+    {
+      "originIndex": 4,
+      "destinationIndex": 13,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 4990,
+      "duration": "691s"
+    },
+    {
+      "originIndex": 13,
+      "destinationIndex": 4,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 4990,
+      "duration": "691s"
+    },
+    {
+      "originIndex": 13,
+      "destinationIndex": 2,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 5709,
+      "duration": "790s"
+    },
+    {
+      "originIndex": 2,
+      "destinationIndex": 13,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 5709,
+      "duration": "790s"
+    },
+    {
+      "originIndex": 13,
+      "destinationIndex": 7,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 7355,
+      "duration": "1018s"
+    },
+    {
+      "originIndex": 7,
+      "destinationIndex": 13,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 7355,
+      "duration": "1018s"
+    },
+    {
+      "originIndex": 2,
+      "destinationIndex": 9,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 11494,
+      "duration": "828s"
+    },
+    {
+      "originIndex": 9,
+      "destinationIndex": 2,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 11494,
+      "duration": "828s"
+    },
+    {
+      "originIndex": 7,
+      "destinationIndex": 9,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 8689,
+      "duration": "626s"
+    },
+    {
+      "originIndex": 9,
+      "destinationIndex": 7,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 8689,
+      "duration": "626s"
+    },
+    {
+      "originIndex": 7,
+      "destinationIndex": 6,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 4545,
+      "duration": "1487s"
+    },
+    {
+      "originIndex": 6,
+      "destinationIndex": 7,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 4545,
+      "duration": "1487s"
+    },
+    {
+      "originIndex": 6,
+      "destinationIndex": 11,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 5569,
+      "duration": "1823s"
+    },
+    {
+      "originIndex": 11,
+      "destinationIndex": 6,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 5569,
+      "duration": "1823s"
+    },
+    {
+      "originIndex": 6,
+      "destinationIndex": 0,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 15217,
+      "duration": "1096s"
+    },
+    {
+      "originIndex": 0,
+      "destinationIndex": 6,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 15217,
+      "duration": "1096s"
+    },
+    {
+      "originIndex": 11,
+      "destinationIndex": 5,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 9097,
+      "duration": "655s"
+    },
+    {
+      "originIndex": 5,
+      "destinationIndex": 11,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 9097,
+      "duration": "655s"
+    },
+    {
+      "originIndex": 11,
+      "destinationIndex": 14,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 6684,
+      "duration": "925s"
+    },
+    {
+      "originIndex": 14,
+      "destinationIndex": 11,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 6684,
+      "duration": "925s"
+    },
+    {
+      "originIndex": 14,
+      "destinationIndex": 1,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 4174,
+      "duration": "939s"
+    },
+    {
+      "originIndex": 1,
+      "destinationIndex": 14,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 4174,
+      "duration": "939s"
+    },
+    {
+      "originIndex": 14,
+      "destinationIndex": 5,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 12024,
+      "duration": "1665s"
+    },
+    {
+      "originIndex": 5,
+      "destinationIndex": 14,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 12024,
+      "duration": "1665s"
+    },
+    {
+      "originIndex": 14,
+      "destinationIndex": 3,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 5538,
+      "duration": "767s"
+    },
+    {
+      "originIndex": 3,
+      "destinationIndex": 14,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 5538,
+      "duration": "767s"
+    },
+    {
+      "originIndex": 3,
+      "destinationIndex": 1,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 4579,
+      "duration": "1030s"
+    },
+    {
+      "originIndex": 1,
+      "destinationIndex": 3,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 4579,
+      "duration": "1030s"
+    },
+    {
+      "originIndex": 5,
+      "destinationIndex": 0,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 8263,
+      "duration": "1144s"
+    },
+    {
+      "originIndex": 0,
+      "destinationIndex": 5,
+      "condition": "ROUTE_EXISTS",
+      "distanceMeters": 8263,
+      "duration": "1144s"
+    }
+  ]
+}

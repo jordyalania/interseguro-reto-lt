@@ -6,6 +6,7 @@ erDiagram
     endorsement_types ||--o{ templates : tiene
     templates ||--|{ template_dynamic_fields : define
     templates ||--|{ template_events : define
+    templates ||--o{ template_input_rules : valida
 
     products {
         serial id PK
@@ -34,6 +35,12 @@ erDiagram
         varchar source_field "NULL si es un valor fijo"
         text default_value
         boolean required
+    }
+    template_input_rules {
+        serial id PK
+        int template_id FK
+        varchar field
+        varchar data_type "string, integer, number, boolean o date"
     }
     template_events {
         serial id PK
@@ -71,6 +78,20 @@ erDiagram
 | Campo ausente | Usa el default | 422 | `null` |
 | `null` | `null` (422 si es obligatorio) | 422 | `null` |
 | `""` | `""` | `""` | `""` |
+
+## Validación de valores
+
+`template_input_rules` indica el tipo de cada campo de entrada. Cada plantilla define sus reglas, y la API responde 422 con `INVALID_FIELD_VALUES` si alguna no se cumple. Un campo sin regla no se revisa.
+
+| Tipo | Válido | Inválido |
+| --- | --- | --- |
+| `string` | `"08200000049"` | `8200000049` |
+| `integer` | `5984` | `"5984"`, `1.5` |
+| `number` | `1.5` | `"1.5"` |
+| `boolean` | `false` | `"false"` |
+| `date` | `"2025-08-27"` | `"12-18-2024"`, `"2025-02-30"`, `""` |
+
+El formulario web lee estas reglas y avisa antes de enviar, pero el control definitivo está en la API, porque se puede llamar sin pasar por la web.
 
 ## Agregar un producto
 

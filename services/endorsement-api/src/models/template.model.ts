@@ -7,6 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import type { JsonValue } from '../entities/endorsement.dto';
+import type { InputDataType } from '../entities/template.entity';
 import { EndorsementTypeModel } from './endorsement-type.model';
 import { ProductModel } from './product.model';
 
@@ -40,6 +41,9 @@ export class TemplateModel {
 
   @OneToMany(() => TemplateEventModel, (event) => event.template)
   events: TemplateEventModel[];
+
+  @OneToMany(() => TemplateInputRuleModel, (rule) => rule.template)
+  inputRules: TemplateInputRuleModel[];
 }
 
 @Entity('template_dynamic_fields')
@@ -81,4 +85,20 @@ export class TemplateEventModel {
 
   @Column({ type: 'varchar', length: 100 })
   description: string;
+}
+
+@Entity('template_input_rules')
+export class TemplateInputRuleModel {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @ManyToOne(() => TemplateModel, (template) => template.inputRules, { nullable: false })
+  @JoinColumn({ name: 'template_id' })
+  template: TemplateModel;
+
+  @Column({ type: 'varchar', length: 100 })
+  field: string;
+
+  @Column({ name: 'data_type', type: 'varchar', length: 20 })
+  dataType: InputDataType;
 }

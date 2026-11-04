@@ -152,6 +152,13 @@ export function rumboTemplateModel(): TemplateModel {
       { id: 2, orderEvent: 2, description: 'AprobarEndoso' },
       { id: 1, orderEvent: 1, description: 'SolicitarEndoso' },
     ],
+    inputRules: [
+      { id: 1, field: 'policyNumber', dataType: 'string' },
+      { id: 2, field: 'idEnvio', dataType: 'integer' },
+      { id: 3, field: 'fechaSolicitud', dataType: 'date' },
+      { id: 4, field: 'fechaCliente', dataType: 'date' },
+      { id: 5, field: 'fechaEfectiva', dataType: 'date' },
+    ],
   } as unknown as TemplateModel;
 }
 

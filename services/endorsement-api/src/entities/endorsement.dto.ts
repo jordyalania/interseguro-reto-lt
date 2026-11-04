@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import type { InputDataType } from './template.entity';
 
 export type FlatValue = string | number | boolean | null;
 
@@ -31,10 +32,17 @@ export interface MissingFieldDto {
   target: string;
 }
 
+export interface InvalidFieldDto {
+  field: string;
+  expected: string;
+  received: FlatValue;
+}
+
 export interface TemplateInputDto {
   name: string;
   required: boolean;
   defaultValue: string | null;
+  dataType: InputDataType;
 }
 
 export interface TemplateSummaryDto {

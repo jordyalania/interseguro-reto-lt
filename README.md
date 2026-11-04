@@ -68,9 +68,21 @@ Todas las rutas requieren `Authorization: Bearer <token>`, salvo el login.
 | 401 | Token ausente o inválido |
 | 404 | No hay plantilla activa |
 | 413 | Cuerpo demasiado grande |
-| 422 | Faltan campos obligatorios, o el siniestro es inalcanzable |
+| 422 | Faltan campos, un valor no cumple el tipo de la plantilla (por ejemplo, una fecha) o el siniestro es inalcanzable |
 
 El traductor devuelve en el cuerpo exactamente el JSON del core, y la plantilla usada en las cabeceras `x-template-id` y `x-template-version`.
+
+## Lima simulada
+
+La pantalla de rutas incluye una red de 16 distritos con **datos sintéticos**, en un formato parecido a Google Routes. No consulta a Google ni usa mediciones reales.
+
+La respuesta simulada pasa por un adaptador que la convierte en el grafo de siempre, y Dijkstra se ejecuta sin cambios. Con el escenario inicial, por distancia gana Surco y por tiempo gana San Isidro.
+
+Para regenerar los datos:
+
+```bash
+node scripts/generate-synthetic-routes.mjs
+```
 
 ## Estructura
 
@@ -115,6 +127,7 @@ Las pruebas de integración levantan PostgreSQL con Testcontainers. Verifican la
 
 - [Diseño de préstamos](architecture/prestamos-to-be.md)
 - [Decisiones de arquitectura](architecture/decisions)
+- [Cómo funciona Dijkstra](docs/dijkstra-explicado.md)
 - [Modelo de datos](docs/modelo-datos.md)
 - [Despliegue en GCP](docs/despliegue-gcp.md)
 - [Guía para la entrevista](docs/guia-entrevista.md)
@@ -123,5 +136,5 @@ Las pruebas de integración levantan PostgreSQL con Testcontainers. Verifican la
 
 - Hay un solo usuario demo, sin renovación de tokens ni límite de intentos de login.
 - Las plantillas se administran por SQL; no hay pantalla ni validación de publicación.
-- Los campos numéricos del formulario se envían como texto, salvo `idEnvio`. El modo JSON permite indicar el tipo exacto.
+- La red de Lima es sintética: no representa calles, distancias ni tráfico reales.
 - El reto 3 es un diseño: no incluye código de préstamos.

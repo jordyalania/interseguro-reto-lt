@@ -1,7 +1,7 @@
 import { type FormEvent, useEffect, useMemo, useState } from 'react';
 import { api, ApiError, type TemplateSummary } from '../api';
 import { JsonOutput } from '../components/JsonOutput';
-import { buildPayload, parseJsonPayload, PDF_EXAMPLE } from '../lib/endorsement-form';
+import { buildPayload, parseJsonPayload, PDF_EXAMPLE, validateForm } from '../lib/endorsement-form';
 
 interface Props {
   token: string;
@@ -36,6 +36,8 @@ export function EndorsementsPage({ token, onUnauthorized }: Props) {
   const [output, setOutput] = useState<unknown>(null);
   const [outputVersion, setOutputVersion] = useState<string | null>(null);
   const [error, setError] = useState<ApiError | null>(null);
+  const [touched, setTouched] = useState<Set<string>>(new Set());
+  const [submitted, setSubmitted] = useState(false);
 
   const selectTemplate = (template: TemplateSummary) => {
     const nextValues = initialValues(template);
@@ -43,13 +45,20 @@ export function EndorsementsPage({ token, onUnauthorized }: Props) {
     setValues(nextValues);
     setJsonText(
       JSON.stringify(
-        buildPayload(template.productCode, template.endorsementTypeCode, nextValues),
+        buildPayload(
+          template.productCode,
+          template.endorsementTypeCode,
+          nextValues,
+          template.inputs,
+        ),
         null,
         2,
       ),
     );
     setOutput(null);
     setError(null);
+    setTouched(new Set());
+    setSubmitted(false);
   };
 
   useEffect(() => {
@@ -81,7 +90,7 @@ export function EndorsementsPage({ token, onUnauthorized }: Props) {
     if (next === 'json' && selected) {
       setJsonText(
         JSON.stringify(
-          buildPayload(selected.productCode, selected.endorsementTypeCode, values),
+          buildPayload(selected.productCode, selected.endorsementTypeCode, values, selected.inputs),
           null,
           2,
         ),
@@ -89,6 +98,13 @@ export function EndorsementsPage({ token, onUnauthorized }: Props) {
     }
     setMode(next);
   };
+
+  const editableInputs = useMemo(
+    () => selected?.inputs.filter(({ name }) => name !== 'producto' && name !== 'tipoEndoso') ?? [],
+    [selected],
+  );
+  const formErrors = useMemo(() => validateForm(editableInputs, values), [editableInputs, values]);
+  const hasBlockingErrors = submitted && mode === 'form' && Object.keys(formErrors).length > 0;
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -104,7 +120,13 @@ export function EndorsementsPage({ token, onUnauthorized }: Props) {
       }
       payload = parsed.payload;
     } else {
-      payload = buildPayload(selected.productCode, selected.endorsementTypeCode, values);
+      setSubmitted(true);
+      if (Object.keys(formErrors).length > 0) {
+        setOutput(null);
+        setError(null);
+        return;
+      }
+      payload = buildPayload(selected.productCode, selected.endorsementTypeCode, values, selected.inputs);
     }
 
     setSubmitting(true);
@@ -124,9 +146,6 @@ export function EndorsementsPage({ token, onUnauthorized }: Props) {
       setSubmitting(false);
     }
   };
-
-  const editableInputs =
-    selected?.inputs.filter(({ name }) => name !== 'producto' && name !== 'tipoEndoso') ?? [];
 
   return (
     <div className="split">
@@ -181,26 +200,41 @@ export function EndorsementsPage({ token, onUnauthorized }: Props) {
 
         {mode === 'form' ? (
           <div className="form-grid">
-            {editableInputs.map((input) => (
-              <label className="field" key={input.name}>
-                <span>
-                  {input.name}
-                  {input.required && (
-                    <span className="required" aria-label="obligatorio">
-                      {' '}
-                      *
+            {editableInputs.map((input) => {
+              const fieldError =
+                touched.has(input.name) || submitted ? formErrors[input.name] : undefined;
+              const errorId = `${input.name}-error`;
+              return (
+                <label className="field" key={input.name}>
+                  <span>
+                    {input.name}
+                    {input.required && (
+                      <span className="required" aria-label="obligatorio">
+                        {' '}
+                        *
+                      </span>
+                    )}
+                  </span>
+                  <input
+                    type={input.dataType === 'date' ? 'date' : 'text'}
+                    inputMode={input.dataType === 'integer' ? 'numeric' : undefined}
+                    value={values[input.name] ?? ''}
+                    placeholder={input.defaultValue ? `Default: ${input.defaultValue}` : ''}
+                    aria-invalid={fieldError ? true : undefined}
+                    aria-describedby={fieldError ? errorId : undefined}
+                    onBlur={() => setTouched((current) => new Set(current).add(input.name))}
+                    onChange={(event) =>
+                      setValues({ ...values, [input.name]: event.target.value })
+                    }
+                  />
+                  {fieldError && (
+                    <span className="field-error" id={errorId}>
+                      {fieldError}
                     </span>
                   )}
-                </span>
-                <input
-                  value={values[input.name] ?? ''}
-                  placeholder={input.defaultValue ? `Default: ${input.defaultValue}` : ''}
-                  onChange={(event) =>
-                    setValues({ ...values, [input.name]: event.target.value })
-                  }
-                />
-              </label>
-            ))}
+                </label>
+              );
+            })}
           </div>
         ) : (
           <label className="field">
@@ -230,11 +264,16 @@ export function EndorsementsPage({ token, onUnauthorized }: Props) {
         {error && (
           <div className="alert error" role="alert">
             <strong>{error.message}</strong>
-            {error.details?.missing && (
+            {error.details && (
               <ul>
-                {error.details.missing.map((item) => (
+                {error.details.invalid?.map((item) => (
+                  <li key={`invalid-${item.field}`}>
+                    <code>{item.field}</code>: se esperaba {item.expected}
+                  </li>
+                ))}
+                {error.details.missing?.map((item) => (
                   <li key={`${item.field}-${item.target}`}>
-                    <code>{item.field}</code> → {item.target}
+                    <code>{item.field}</code>: falta (se usa en {item.target})
                   </li>
                 ))}
               </ul>
@@ -242,7 +281,12 @@ export function EndorsementsPage({ token, onUnauthorized }: Props) {
           </div>
         )}
         {output !== null && <JsonOutput value={output} />}
-        {output === null && !error && (
+        {output === null && !error && hasBlockingErrors && (
+          <p className="alert error" role="alert">
+            Corrige los campos marcados para traducir.
+          </p>
+        )}
+        {output === null && !error && !hasBlockingErrors && (
           <p className="empty">El resultado aparecerá aquí, con el orden que define la plantilla.</p>
         )}
       </section>

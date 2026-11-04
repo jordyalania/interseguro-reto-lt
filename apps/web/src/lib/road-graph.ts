@@ -47,6 +47,43 @@ export function layoutNodes(names: string[], size: number): PositionedNode[] {
   });
 }
 
+/** Ubica los distritos según sus coordenadas. Devuelve null si a alguno le faltan. */
+export function layoutByCoordinates(
+  names: string[],
+  coordinates: Record<string, { latitude: number; longitude: number }>,
+  size: number,
+): PositionedNode[] | null {
+  const points = names.map((name) => coordinates[name]);
+  if (points.length === 0 || points.some((point) => !point)) {
+    return null;
+  }
+
+  // Mezcla la posición real con el orden relativo: conserva quién está al norte o al este,
+  // pero separa el centro de Lima, donde los distritos quedarían amontonados.
+  const spread = (values: number[]): number[] => {
+    const min = Math.min(...values);
+    const range = Math.max(...values) - min || 1;
+    const sorted = [...values].sort((a, b) => a - b);
+    const lastRank = Math.max(values.length - 1, 1);
+    return values.map((value) => {
+      const linear = (value - min) / range;
+      const rank = sorted.indexOf(value) / lastRank;
+      return (linear + rank) / 2;
+    });
+  };
+
+  const xs = spread(points.map((point) => point!.longitude));
+  const ys = spread(points.map((point) => point!.latitude));
+  const padding = 60;
+  const area = size - padding * 2;
+
+  return names.map((name, index) => ({
+    name,
+    x: padding + xs[index]! * area,
+    y: padding + (1 - ys[index]!) * area,
+  }));
+}
+
 /** Une los dos sentidos de una calle en una sola línea. */
 export function listEdges(graph: RoadGraph): DrawnEdge[] {
   const edges = new Map<string, DrawnEdge>();

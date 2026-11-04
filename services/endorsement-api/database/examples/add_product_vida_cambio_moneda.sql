@@ -47,3 +47,17 @@ CROSS JOIN (VALUES
   (2, 'ValidarTipoCambio'),
   (3, 'AprobarEndoso')
 ) AS e(order_event, description);
+
+INSERT INTO template_input_rules (template_id, field, data_type)
+SELECT t.id, r.field, r.data_type
+FROM templates t
+JOIN products p ON p.id = t.product_id
+JOIN endorsement_types e ON e.id = t.endorsement_type_id
+CROSS JOIN (VALUES
+  ('policyNumber', 'string'),
+  ('monedaActual', 'string'),
+  ('monedaNueva',  'string'),
+  ('canal',        'string')
+) AS r(field, data_type)
+WHERE p.code = 'VidaAhorro' AND e.code = 'CambioMoneda' AND t.version = 1
+ON CONFLICT (template_id, field) DO NOTHING;

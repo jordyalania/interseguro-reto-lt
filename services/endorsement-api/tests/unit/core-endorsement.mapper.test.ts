@@ -144,7 +144,18 @@ describe('describeTemplateInputs', () => {
     const inputs = describeTemplateInputs(rumbo());
 
     expect(inputs.filter((input) => input.name === 'producto')).toHaveLength(1);
-    expect(inputs).toContainEqual({ name: 'usuario', required: false, defaultValue: 'sistema' });
-    expect(inputs).toContainEqual({ name: 'plan', required: true, defaultValue: null });
+    expect(inputs).toContainEqual({
+      name: 'usuario',
+      required: false,
+      defaultValue: 'sistema',
+      dataType: 'string',
+    });
+    expect(inputs).toContainEqual({
+      name: 'plan',
+      required: true,
+      defaultValue: null,
+      dataType: 'string',
+    });
+    expect(inputs.find((input) => input.name === 'fechaCliente')?.dataType).toBe('date');
   });
 });

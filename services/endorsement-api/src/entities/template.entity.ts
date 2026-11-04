@@ -9,6 +9,14 @@ export interface TemplateDefinition {
   skeleton: JsonValue;
   dynamicFields: DynamicFieldDefinition[];
   events: TemplateEventDefinition[];
+  inputRules: InputRuleDefinition[];
+}
+
+export type InputDataType = 'string' | 'integer' | 'number' | 'boolean' | 'date';
+
+export interface InputRuleDefinition {
+  field: string;
+  dataType: InputDataType;
 }
 
 export interface DynamicFieldDefinition {

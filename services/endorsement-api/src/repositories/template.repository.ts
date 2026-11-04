@@ -11,6 +11,7 @@ const RELATIONS = {
   endorsementType: true,
   dynamicFields: true,
   events: true,
+  inputRules: true,
 } as const;
 
 export class TypeOrmTemplateRepository implements TemplateRepository {

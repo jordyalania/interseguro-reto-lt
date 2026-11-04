@@ -3,7 +3,10 @@ export class ApiError extends Error {
     readonly status: number,
     readonly code: string,
     message: string,
-    readonly details?: { missing?: { field: string; target: string }[] },
+    readonly details?: {
+      missing?: { field: string; target: string }[];
+      invalid?: { field: string; expected: string; received: unknown }[];
+    },
   ) {
     super(message);
   }
@@ -14,10 +17,13 @@ interface ApiResponse<T> {
   headers: Headers;
 }
 
+export type InputDataType = 'string' | 'integer' | 'number' | 'boolean' | 'date';
+
 export interface TemplateInput {
   name: string;
   required: boolean;
   defaultValue: string | null;
+  dataType: InputDataType;
 }
 
 export interface TemplateSummary {

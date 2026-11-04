@@ -1,20 +1,38 @@
 import { type FormEvent, useMemo, useState } from 'react';
-import { api, ApiError, type OptimalRoute } from '../api';
+import { api, ApiError, type OptimalRoute, type RoadGraph } from '../api';
 import { GraphView } from '../components/GraphView';
 import { JsonOutput } from '../components/JsonOutput';
 import { listNodes, parseGraph, PDF_GRAPH } from '../lib/road-graph';
+import {
+  METRIC_UNIT,
+  type RouteMatrixResponse,
+  type RouteMetric,
+  syntheticRouteProvider,
+  toCoordinates,
+  toRoadGraph,
+} from '../lib/route-provider';
 
 interface Props {
   token: string;
   onUnauthorized: () => void;
 }
 
-const INITIAL_GRAPH = JSON.stringify(PDF_GRAPH, null, 2);
+type Source = 'pdf' | 'lima';
+
+const toText = (graph: RoadGraph) => JSON.stringify(graph, null, 2);
+
+const SCENARIOS: Record<Source, { accident: string; depots: string[] }> = {
+  pdf: { accident: 'San Isidro', depots: ['Miraflores', 'Ate'] },
+  lima: { accident: 'La Molina', depots: ['San Isidro', 'Surco'] },
+};
 
 export function RoutesPage({ token, onUnauthorized }: Props) {
-  const [graphText, setGraphText] = useState(INITIAL_GRAPH);
-  const [accident, setAccident] = useState('San Isidro');
-  const [depots, setDepots] = useState<string[]>(['Miraflores', 'Ate']);
+  const [source, setSource] = useState<Source>('pdf');
+  const [metric, setMetric] = useState<RouteMetric>('distance');
+  const [matrix, setMatrix] = useState<RouteMatrixResponse | null>(null);
+  const [graphText, setGraphText] = useState(toText(PDF_GRAPH));
+  const [accident, setAccident] = useState(SCENARIOS.pdf.accident);
+  const [depots, setDepots] = useState<string[]>(SCENARIOS.pdf.depots);
   const [route, setRoute] = useState<OptimalRoute | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -22,7 +40,40 @@ export function RoutesPage({ token, onUnauthorized }: Props) {
   const parsed = useMemo(() => parseGraph(graphText), [graphText]);
   const graph = 'graph' in parsed ? parsed.graph : null;
   const nodes = useMemo(() => (graph ? listNodes(graph) : []), [graph]);
+  const coordinates = useMemo(
+    () => (source === 'lima' && matrix ? toCoordinates(matrix) : undefined),
+    [source, matrix],
+  );
   const validDepots = depots.filter((depot) => nodes.includes(depot));
+  const unit = source === 'lima' ? ` ${METRIC_UNIT[metric]}` : '';
+
+  const loadSource = async (next: Source) => {
+    setRoute(null);
+    setError(null);
+    setSource(next);
+    setAccident(SCENARIOS[next].accident);
+    setDepots(SCENARIOS[next].depots);
+
+    if (next === 'pdf') {
+      setGraphText(toText(PDF_GRAPH));
+      return;
+    }
+    try {
+      const data = await syntheticRouteProvider.getRouteMatrix();
+      setMatrix(data);
+      setGraphText(toText(toRoadGraph(data, metric)));
+    } catch (caught) {
+      setError((caught as Error).message);
+    }
+  };
+
+  const changeMetric = (next: RouteMetric) => {
+    setMetric(next);
+    setRoute(null);
+    if (matrix) {
+      setGraphText(toText(toRoadGraph(matrix, next)));
+    }
+  };
 
   const toggleDepot = (name: string) => {
     setRoute(null);
@@ -63,20 +114,61 @@ export function RoutesPage({ token, onUnauthorized }: Props) {
             <h2>Datos del siniestro</h2>
             <p className="muted">Puedes cambiar la red sin tocar el algoritmo.</p>
           </div>
-          <button
-            type="button"
-            className="button ghost"
-            onClick={() => {
-              setGraphText(INITIAL_GRAPH);
-              setAccident('San Isidro');
-              setDepots(['Miraflores', 'Ate']);
-              setRoute(null);
-              setError(null);
-            }}
-          >
-            Restaurar ejemplo
+          <button type="button" className="button ghost" onClick={() => void loadSource(source)}>
+            Restaurar
           </button>
         </div>
+
+        <div className="field">
+          <span id="source-label">Red de distritos</span>
+          <div className="segmented wide" role="group" aria-labelledby="source-label">
+            <button
+              type="button"
+              className={source === 'pdf' ? 'active' : ''}
+              aria-pressed={source === 'pdf'}
+              onClick={() => void loadSource('pdf')}
+            >
+              Ejemplo del PDF
+            </button>
+            <button
+              type="button"
+              className={source === 'lima' ? 'active' : ''}
+              aria-pressed={source === 'lima'}
+              onClick={() => void loadSource('lima')}
+            >
+              Lima simulada
+            </button>
+          </div>
+        </div>
+
+        {source === 'lima' && (
+          <>
+            <p className="alert warning" role="status">
+              Datos simulados con forma parecida a Google Routes. No son mediciones reales.
+            </p>
+            <div className="field">
+              <span id="metric-label">Elegir la ruta por</span>
+              <div className="segmented wide" role="group" aria-labelledby="metric-label">
+                <button
+                  type="button"
+                  className={metric === 'distance' ? 'active' : ''}
+                  aria-pressed={metric === 'distance'}
+                  onClick={() => changeMetric('distance')}
+                >
+                  Menor distancia
+                </button>
+                <button
+                  type="button"
+                  className={metric === 'time' ? 'active' : ''}
+                  aria-pressed={metric === 'time'}
+                  onClick={() => changeMetric('time')}
+                >
+                  Menor tiempo
+                </button>
+              </div>
+            </div>
+          </>
+        )}
 
         <label className="field">
           <span>Ubicación del accidente</span>
@@ -116,7 +208,7 @@ export function RoutesPage({ token, onUnauthorized }: Props) {
         </fieldset>
 
         <label className="field">
-          <span>Red de distritos (distrito → vecino → distancia)</span>
+          <span>Grafo que recibe la API (distrito → vecino → peso)</span>
           <textarea
             className="code"
             rows={9}
@@ -134,6 +226,13 @@ export function RoutesPage({ token, onUnauthorized }: Props) {
           </p>
         )}
 
+        {source === 'lima' && matrix && (
+          <details className="details">
+            <summary>Ver la respuesta simulada del proveedor</summary>
+            <JsonOutput value={matrix} />
+          </details>
+        )}
+
         <button
           className="button primary"
           disabled={submitting || !graph || validDepots.length === 0 || !nodes.includes(accident)}
@@ -147,7 +246,8 @@ export function RoutesPage({ token, onUnauthorized }: Props) {
           <h2>Resultado</h2>
           {route && (
             <span className="badge success">
-              {route.fromDepot} · distancia {route.distance}
+              {route.fromDepot} · {route.distance}
+              {unit}
             </span>
           )}
         </div>
@@ -157,10 +257,20 @@ export function RoutesPage({ token, onUnauthorized }: Props) {
           </p>
         )}
         {graph && (
-          <GraphView graph={graph} accident={accident} depots={validDepots} path={route?.path ?? []} />
+          <GraphView
+            graph={graph}
+            accident={accident}
+            depots={validDepots}
+            path={route?.path ?? []}
+            coordinates={coordinates}
+          />
         )}
         {route && <JsonOutput value={route} />}
-        <p className="muted small">Esquema de la red, no un mapa geográfico.</p>
+        <p className="muted small">
+          {source === 'lima'
+            ? 'Esquema orientado por coordenadas aproximadas; no es un mapa a escala. Solo se muestran los pesos de la ruta elegida.'
+            : 'Esquema de la red, no un mapa geográfico.'}
+        </p>
       </section>
     </div>
   );

@@ -1,18 +1,29 @@
 import { useMemo } from 'react';
 import type { RoadGraph } from '../api';
-import { isEdgeOnPath, layoutNodes, listEdges, listNodes } from '../lib/road-graph';
+import {
+  isEdgeOnPath,
+  layoutByCoordinates,
+  layoutNodes,
+  listEdges,
+  listNodes,
+} from '../lib/road-graph';
+import type { LatLng } from '../lib/route-provider';
 
 interface Props {
   graph: RoadGraph;
   accident: string;
   depots: string[];
   path: string[];
+  coordinates?: Record<string, LatLng>;
 }
 
-const SIZE = 460;
+const SIZE = 560;
 
-export function GraphView({ graph, accident, depots, path }: Props) {
-  const nodes = useMemo(() => layoutNodes(listNodes(graph), SIZE), [graph]);
+export function GraphView({ graph, accident, depots, path, coordinates }: Props) {
+  const nodes = useMemo(() => {
+    const names = listNodes(graph);
+    return (coordinates && layoutByCoordinates(names, coordinates, SIZE)) || layoutNodes(names, SIZE);
+  }, [graph, coordinates]);
   const edges = useMemo(() => listEdges(graph), [graph]);
   const position = useMemo(() => new Map(nodes.map((node) => [node.name, node])), [nodes]);
 
@@ -40,10 +51,21 @@ export function GraphView({ graph, accident, depots, path }: Props) {
                 y2={to.y}
                 className={onPath ? 'edge on-path' : 'edge'}
               />
-              <circle cx={labelX} cy={labelY} r={12} className="edge-label-bg" />
-              <text x={labelX} y={labelY} className="edge-label">
-                {edge.label}
-              </text>
+              {(onPath || !coordinates) && (
+                <>
+                  <rect
+                    x={labelX - edge.label.length * 3.4 - 3}
+                    y={labelY - 8}
+                    width={edge.label.length * 6.8 + 6}
+                    height={16}
+                    rx={4}
+                    className="edge-label-bg"
+                  />
+                  <text x={labelX} y={labelY} className={onPath ? 'edge-label on-path' : 'edge-label'}>
+                    {edge.label}
+                  </text>
+                </>
+              )}
             </g>
           );
         })}
@@ -56,14 +78,10 @@ export function GraphView({ graph, accident, depots, path }: Props) {
               <circle
                 cx={node.x}
                 cy={node.y}
-                r={onPath ? 13 : 10}
+                r={onPath ? 11 : 8}
                 className={`node ${kind}${onPath ? ' on-path' : ''}`}
               />
-              <text
-                x={node.x}
-                y={node.y + (node.y < SIZE / 2 ? -20 : 28)}
-                className="node-label"
-              >
+              <text x={node.x} y={node.y - 15} className="node-label">
                 {node.name}
               </text>
             </g>

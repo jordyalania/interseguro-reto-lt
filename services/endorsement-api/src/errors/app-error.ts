@@ -6,6 +6,7 @@ export const ErrorCode = {
   InvalidCredentials: 'INVALID_CREDENTIALS',
   TemplateNotFound: 'TEMPLATE_NOT_FOUND',
   MissingRequiredFields: 'MISSING_REQUIRED_FIELDS',
+  InvalidFieldValues: 'INVALID_FIELD_VALUES',
   TemplateMisconfigured: 'TEMPLATE_MISCONFIGURED',
   Internal: 'INTERNAL_ERROR',
 } as const;

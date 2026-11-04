@@ -133,6 +133,7 @@ export function describeTemplateInputs(template: TemplateDefinition): TemplateIn
       name,
       required: required || (current?.required ?? false),
       defaultValue: current?.defaultValue ?? defaultValue,
+      dataType: template.inputRules.find((rule) => rule.field === name)?.dataType ?? 'string',
     });
   };
 

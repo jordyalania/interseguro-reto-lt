@@ -57,6 +57,36 @@ describe('API de endosos', () => {
       expect(body.details.missing.map((item) => item.field)).toContain('policyNumber');
     });
 
+    it('devuelve 422 con una fecha en otro formato, como la del ejemplo reportado', async () => {
+      const response = await translate({ ...pdfInput, fechaCliente: '12-18-2024' });
+      const body = response.result as {
+        code: string;
+        details: { invalid: { field: string; received: string }[] };
+      };
+
+      expect(response.statusCode).toBe(422);
+      expect(body.code).toBe('INVALID_FIELD_VALUES');
+      expect(body.details.invalid).toEqual([
+        {
+          field: 'fechaCliente',
+          expected: 'fecha real con formato AAAA-MM-DD',
+          received: '12-18-2024',
+        },
+      ]);
+    });
+
+    it('reporta juntos los valores inválidos y los campos faltantes', async () => {
+      const { plan: _omitted, ...input } = pdfInput;
+      const response = await translate({ ...input, idEnvio: 'abc' });
+      const body = response.result as {
+        details: { invalid: { field: string }[]; missing: { field: string }[] };
+      };
+
+      expect(response.statusCode).toBe(422);
+      expect(body.details.invalid.map((item) => item.field)).toEqual(['idEnvio']);
+      expect(body.details.missing.map((item) => item.field)).toEqual(['plan']);
+    });
+
     it('devuelve 400 si faltan producto o tipoEndoso', async () => {
       const response = await translate({ policyNumber: '1' });
 

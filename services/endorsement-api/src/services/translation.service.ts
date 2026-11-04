@@ -7,6 +7,7 @@ import { appError, ErrorCode, TemplateConfigurationError } from '../errors/app-e
 import { buildCoreEndorsement, describeTemplateInputs } from '../mappers/core-endorsement.mapper';
 import { toTemplateDefinition } from '../mappers/template.mapper';
 import type { TemplateRepository } from '../repositories/template.repository';
+import { validateInputValues } from './input-validator';
 
 export class TranslationService {
   constructor(private readonly templates: TemplateRepository) {}
@@ -25,6 +26,16 @@ export class TranslationService {
 
     const template = toTemplateDefinition(model);
     const { document, missing } = this.build(template, request);
+    const invalid = validateInputValues(template.inputRules, request);
+
+    if (invalid.length > 0) {
+      throw appError(
+        422,
+        ErrorCode.InvalidFieldValues,
+        'Hay campos con valores inválidos para la plantilla configurada',
+        { invalid, missing },
+      );
+    }
 
     if (missing.length > 0) {
       throw appError(

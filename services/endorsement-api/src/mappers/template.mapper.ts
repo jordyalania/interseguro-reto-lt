@@ -20,5 +20,6 @@ export function toTemplateDefinition(model: TemplateModel): TemplateDefinition {
     events: [...model.events]
       .sort((a, b) => a.orderEvent - b.orderEvent)
       .map(({ description, orderEvent }) => ({ description, orderEvent })),
+    inputRules: (model.inputRules ?? []).map(({ field, dataType }) => ({ field, dataType })),
   };
 }

@@ -56,11 +56,20 @@ describe('traducción contra PostgreSQL real', () => {
     expect(response.payload).toBe(JSON.stringify(pdfOutput));
   });
 
+  it('rechaza una fecha inválida con las reglas guardadas en BD', async () => {
+    const response = await translate({ ...pdfInput, fechaCliente: '12-18-2024' });
+
+    expect(response.statusCode).toBe(422);
+    expect(response.result).toMatchObject({ code: 'INVALID_FIELD_VALUES' });
+  });
+
   it('volver a ejecutar migraciones y seeds no duplica datos', async () => {
     await migrateAndSeed(dataSource);
 
     const [{ total }] = await dataSource.query('SELECT count(*)::int AS total FROM template_dynamic_fields');
+    const [{ rules }] = await dataSource.query('SELECT count(*)::int AS rules FROM template_input_rules');
     expect(total).toBe(12);
+    expect(rules).toBe(9);
   });
 
   it('admite un producto nuevo solo con SQL, sin cambiar código', async () => {
@@ -80,6 +89,15 @@ describe('traducción contra PostgreSQL real', () => {
       monedaActual: 'Nuevo Sol',
       monedaNueva: 'Dólar',
     });
+
+    const invalid = await translate({
+      producto: 'VidaAhorro',
+      tipoEndoso: 'CambioMoneda',
+      policyNumber: 859834,
+      monedaActual: 'Nuevo Sol',
+      monedaNueva: 'Dólar',
+    });
+    expect(invalid.statusCode).toBe(422);
 
     expect(after.statusCode).toBe(200);
     expect(after.payload).toBe(
