@@ -1,8 +1,10 @@
 # Préstamos de Renta Particular: arquitectura TO-BE
 
-Diagramas editables: [as-is.drawio](as-is.drawio) y [to-be.drawio](to-be.drawio).
+Diagramas editables: [as-is.drawio](as-is.drawio) y [to-be.drawio](to-be.drawio). Cada archivo abre en una vista simple y trae una página "Detalle" con todos los componentes.
 
-![Arquitectura TO-BE](to-be.svg)
+![Vista simple de la propuesta](to-be.svg)
+
+Vista completa: [situación actual](as-is-detalle.svg) y [propuesta](to-be-detalle.svg).
 
 ## El problema
 

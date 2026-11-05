@@ -6,7 +6,7 @@
 2. **Traductor (2 min).** Traduce el ejemplo del PDF. En el formulario, borra `policyNumber` y muestra el aviso. En modo JSON, cambia `fechaCliente` a `12-18-2024` y muestra el 422 de la API.
 3. **Extensibilidad (1 min).** Ejecuta `./scripts/demo-add-product.sh`, inicia sesión de nuevo y traduce el producto nuevo. No se tocó código.
 4. **Rutas (1 min).** Calcula el ejemplo del PDF. Abre "Lima simulada" y cambia de "Menor distancia" a "Menor tiempo": la base ganadora pasa de Surco a San Isidro con el mismo algoritmo.
-5. **Préstamos (2 min).** Abre `to-be.drawio` y recorre la tabla de "La pregunta clave".
+5. **Préstamos (2 min).** Abre `as-is.drawio` y `to-be.drawio` en su vista simple. Si piden más, pasa a la página "Detalle" y a la tabla de "La pregunta clave".
 
 ## Preguntas probables
 
