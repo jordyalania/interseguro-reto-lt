@@ -19,6 +19,12 @@ flowchart LR
     R -. verifica con clave pública .-> U
 ```
 
+## Demo
+
+Frontend en Cloud Run: https://web-245708324383.us-central1.run.app
+
+La primera visita tras un periodo inactivo puede tardar unos segundos. Las credenciales se comparten por separado.
+
 ## Ejecutar
 
 Requiere Docker y `openssl`.

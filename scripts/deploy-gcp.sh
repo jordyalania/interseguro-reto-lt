@@ -21,16 +21,34 @@ REGISTRY="${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}"
 echo "Proyecto: $PROJECT_ID | Región: $REGION | Versión: $TAG"
 
 echo '==> Activando APIs'
-gcloud services enable run.googleapis.com artifactregistry.googleapis.com secretmanager.googleapis.com
+gcloud services enable run.googleapis.com artifactregistry.googleapis.com secretmanager.googleapis.com iam.googleapis.com
+
+# En un proyecto nuevo, una API activada puede tardar unos minutos en responder.
+echo '==> Esperando que las APIs estén disponibles'
+for attempt in {1..24}; do
+  if gcloud artifacts repositories list --location "$REGION" --quiet >/dev/null 2>&1 &&
+    gcloud secrets list --limit 1 --quiet >/dev/null 2>&1 &&
+    gcloud iam service-accounts list --limit 1 --quiet >/dev/null 2>&1; then
+    break
+  fi
+  [[ "$attempt" -lt 24 ]] || { echo 'Las APIs no respondieron a tiempo'; exit 1; }
+  sleep 10
+done
 
 echo '==> Preparando el repositorio de imágenes'
 gcloud artifacts repositories describe "$REPOSITORY" --location "$REGION" >/dev/null 2>&1 ||
-  gcloud artifacts repositories create "$REPOSITORY" --location "$REGION" --repository-format docker
+  gcloud artifacts repositories create "$REPOSITORY" --location "$REGION" --repository-format docker --quiet
 gcloud auth configure-docker "${REGION}-docker.pkg.dev" --quiet
 
 echo '==> Preparando la cuenta de servicio'
 gcloud iam service-accounts describe "$RUNTIME_SA" >/dev/null 2>&1 ||
   gcloud iam service-accounts create reto-runtime --display-name 'Servicios del reto'
+
+# La cuenta recién creada puede tardar unos segundos en ser visible para IAM.
+for attempt in {1..12}; do
+  gcloud iam service-accounts describe "$RUNTIME_SA" --quiet >/dev/null 2>&1 && break
+  sleep 5
+done
 
 # Crea el secreto si falta, agrega una versión y da acceso solo a la cuenta de servicio.
 put_secret() {

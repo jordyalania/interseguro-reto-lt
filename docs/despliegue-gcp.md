@@ -2,7 +2,7 @@
 
 Publica las imágenes en Artifact Registry y despliega las tres aplicaciones en Cloud Run. La base de datos vive en Neon.
 
-> Este procedimiento todavía no se ha ejecutado contra una cuenta real. Confirma también los límites vigentes en [la capa gratuita de Google Cloud](https://cloud.google.com/free) y [los planes de Neon](https://neon.com/pricing).
+> Este procedimiento ya se ejecutó en un proyecto nuevo y la prueba de punta a punta pasó. Confirma los límites vigentes en [la capa gratuita de Google Cloud](https://cloud.google.com/free) y [los planes de Neon](https://neon.com/pricing).
 
 ## Antes de empezar
 
